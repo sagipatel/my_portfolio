@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="Sagar Zadafiya — Senior Flutter Developer Portfolio">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flutter Dev Portfolio</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      background-color: #070B14;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #070B14;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .loading-text {
+      color: #94A3B8;
+      font-family: sans-serif;
+      font-size: 14px;
+      letter-spacing: 2px;
+    }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid rgba(108,99,255,0.2);
+      border-top-color: #6C63FF;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">LOADING PORTFOLIO...</div>
+  </div>
+
+  <script>
+    window.addEventListener('flutter-first-frame', function() {
+      document.getElementById('loading').remove();
+    });
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

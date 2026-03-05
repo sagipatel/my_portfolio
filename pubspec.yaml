@@ -1,0 +1,29 @@
+name: flutter_portfolio
+description: Flutter Developer Portfolio - Glass UI
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.10.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+
+  # UI & Animations
+  google_fonts: ^6.1.0
+  animate_do: ^3.1.2
+  flutter_staggered_animations: ^1.1.1
+  visibility_detector: ^0.4.0+2
+
+  # Utils
+  url_launcher: ^6.2.4
+  scrollable_positioned_list: ^0.3.8
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
