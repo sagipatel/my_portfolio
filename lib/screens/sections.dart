@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
 import '../models/portfolio_data.dart';
 import '../widgets/glass_widgets.dart';
@@ -33,7 +34,9 @@ class AboutSection extends StatelessWidget {
               : Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(child: _AboutTextCard()),
+                    Expanded(
+                        flex: 2,
+                        child: _AboutTextCard()),
                     const SizedBox(width: 28),
                     Expanded(child: _TimelineCard()),
                   ],
@@ -52,12 +55,21 @@ class _AboutTextCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _AboutPara("I'm a <b>Senior Flutter Developer</b> with 6+ years of crafting cross-platform mobile applications used by millions. I specialise in clean architecture, scalable state management, and pixel-perfect UI."),
+          _AboutPara('''Got a Flutter app to build, fix, or scale? You're in the right place.
+ I'm Sagar, a Flutter Developer with 7+ years of experience building production-ready apps for startups and businesses across Android, iOS, and Web.
+ I specialize in full app development, pixel-perfect UI from Figma, app optimization, and scalable architectures. I also integrate Firebase, APIs, AI (OpenAI/Gemini), and automation using n8n to create powerful, connected applications.
+ What I can help with:
+ 📱 Flutter app development (Android, iOS & Web)
+ 🎨 Figma/XD → Pixel-perfect Flutter UI
+ ⚙️ Clean architecture (BLoC, Riverpod, GetX, Provider)
+ 🔗 API integrations & AI features
+ 🔁 Automation workflows with n8n
+ 🗄 Firebase, local databases & real-time apps
+ 🚀 App Store & Play Store deployment
+
+ I focus on building fast, scalable apps that solve real business problems — not just writing code.
+ If you're looking for a reliable Flutter expert to bring your idea to life, let's connect'''),
           const SizedBox(height: 14),
-          _AboutPara("I've worked with <b>startups, scale-ups and Fortune 500 companies</b> across fintech, healthcare, edtech, and e-commerce — always obsessing over performance, DX, and shipping on time."),
-          const SizedBox(height: 14),
-          _AboutPara("When not coding I contribute to open-source Flutter packages, write technical articles, and mentor junior mobile developers."),
-          const SizedBox(height: 24),
           // Highlights grid
           GridView.count(
             crossAxisCount: 2, shrinkWrap: true,
@@ -67,8 +79,11 @@ class _AboutTextCard extends StatelessWidget {
             children: const [
               _HighlightMini(icon: '📱', title: 'iOS & Android', sub: 'CROSS-PLATFORM'),
               _HighlightMini(icon: '🌐', title: 'Flutter Web', sub: 'PWA READY'),
+              _HighlightMini(icon: '🤖', title: 'AI Integrations', sub: 'OPEN AI | GEMINI | CALUDE'),
+              _HighlightMini(icon: '⚙️', title: 'n8n Automation', sub: 'WORKFLOWS,API and AI'),
               _HighlightMini(icon: '🏗️', title: 'Clean Arch', sub: 'SOLID PRINCIPLES'),
               _HighlightMini(icon: '🚀', title: 'CI / CD', sub: 'CODEMAGIC · FASTLANE'),
+
             ],
           ),
         ],
@@ -97,9 +112,12 @@ class _AboutPara extends StatelessWidget {
       ));
       bold = !bold;
     }
-    return Text.rich(
-      TextSpan(children: spans),
-      style: GoogleFonts.plusJakartaSans(fontSize: 14, height: 1.8),
+    return Padding(
+      padding: const EdgeInsets.all(6.0),
+      child: Text.rich(
+        TextSpan(children: spans),
+        style: GoogleFonts.plusJakartaSans(fontSize: 14, height: 1.8),
+      ),
     );
   }
 }
@@ -431,8 +449,17 @@ class _FeaturedLeft extends StatelessWidget {
           children: project.tags.map((t) => PillTag(t, style: PillStyle.indigo)).toList()),
         const SizedBox(height: 18),
         Wrap(spacing: 10, children: [
-          _LinkButton(label: '↗ Live App', filled: true),
-          _LinkButton(label: 'GitHub'),
+          if (project.liveUrl != null)
+            _LinkButton(
+              label: '↗ Live App', 
+              filled: true,
+              onTap: () => launchUrl(Uri.parse(project.liveUrl!)),
+            ),
+          if (project.githubUrl != null)
+            _LinkButton(
+              label: 'GitHub',
+              onTap: () => launchUrl(Uri.parse(project.githubUrl!)),
+            ),
         ]),
       ],
     );
@@ -513,38 +540,78 @@ class _ProjectCard extends StatelessWidget {
       hoverable: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
         children: [
+          // Top: Icon + link buttons
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 46, height: 46,
+                width: 48, height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.04),
+                  gradient: LinearGradient(
+                    colors: [AppColors.indigo.withOpacity(0.25), AppColors.sky.withOpacity(0.12)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.glassBorder),
+                  border: Border.all(color: AppColors.indigo.withOpacity(0.2)),
                 ),
-                child: Center(child: Text(project.icon, style: const TextStyle(fontSize: 20))),
+                child: Center(child: Text(project.icon, style: const TextStyle(fontSize: 22))),
               ),
               Row(children: [
-                _LinkButton(label: '↗', filled: false, small: true),
-                const SizedBox(width: 8),
-                _LinkButton(label: 'GH', filled: false, small: true),
+                if (project.liveUrl != null)
+                  _LinkButton(
+                    label: '↗ View',
+                    filled: true,
+                    small: true,
+                    onTap: () => launchUrl(Uri.parse(project.liveUrl!)),
+                  ),
+                if (project.liveUrl != null && project.githubUrl != null)
+                  const SizedBox(width: 8),
+                if (project.githubUrl != null)
+                  _LinkButton(
+                    label: 'GH',
+                    filled: false,
+                    small: true,
+                    onTap: () => launchUrl(Uri.parse(project.githubUrl!)),
+                  ),
               ]),
             ],
           ),
-          const SizedBox(height: 18),
-          Text(project.name,
-              style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 8),
-          Text(project.desc,
-              style: GoogleFonts.plusJakartaSans(fontSize: 13, color: AppColors.textSub, height: 1.6)),
           const SizedBox(height: 16),
-          Wrap(spacing: 7, runSpacing: 7,
+
+          // Title
+          Text(
+            project.name,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 15, fontWeight: FontWeight.w700, height: 1.3,
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // Description — flexes to fill remaining space
+          Expanded(
+            child: Text(
+              project.desc.split('\n').first,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 12.5, color: AppColors.textSub, height: 1.65,
+              ),
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // Tags — always at bottom
+          Wrap(
+            spacing: 6, runSpacing: 6,
             children: project.tags.asMap().entries.map((e) {
               final styles = [PillStyle.indigo, PillStyle.sky, PillStyle.emerald, PillStyle.pink];
               return PillTag(e.value, style: styles[e.key % styles.length]);
-            }).toList()),
+            }).toList(),
+          ),
         ],
       ),
     );
@@ -555,7 +622,8 @@ class _LinkButton extends StatefulWidget {
   final String label;
   final bool filled;
   final bool small;
-  const _LinkButton({required this.label, this.filled = false, this.small = false});
+  final VoidCallback? onTap;
+  const _LinkButton({required this.label, this.filled = false, this.small = false, this.onTap});
   @override
   State<_LinkButton> createState() => _LinkButtonState();
 }
@@ -564,10 +632,12 @@ class _LinkButtonState extends State<_LinkButton> {
   bool _hovered = false;
   @override
   Widget build(BuildContext context) => MouseRegion(
-    cursor: SystemMouseCursors.click,
+    cursor: widget.onTap != null ? SystemMouseCursors.click : MouseCursor.defer,
     onEnter: (_) => setState(() => _hovered = true),
     onExit:  (_) => setState(() => _hovered = false),
-    child: AnimatedContainer(
+    child: GestureDetector(
+      onTap: widget.onTap,
+      child: AnimatedContainer(
       duration: const Duration(milliseconds: 180),
       padding: EdgeInsets.symmetric(
         horizontal: widget.small ? 10 : 18,
@@ -586,6 +656,7 @@ class _LinkButtonState extends State<_LinkButton> {
             fontSize: widget.small ? 11 : 13, fontWeight: FontWeight.w700,
             color: widget.filled ? Colors.white : (_hovered ? AppColors.violet : AppColors.textSub),
           )),
+      ),
     ),
   );
 }
@@ -664,11 +735,23 @@ class _ContactInfo extends StatelessWidget {
           Text('I work with clients globally across all timezones. Whether it\'s a brand-new app, a Flutter migration, or a performance audit — let\'s talk.',
               style: GoogleFonts.plusJakartaSans(fontSize: 14, color: AppColors.textSub, height: 1.7)),
           const SizedBox(height: 28),
-          ContactChannel(icon: '✉️', label: PortfolioData.email),
+          ContactChannel(
+            icon: '✉️', 
+            label: PortfolioData.email,
+            onTap: () => launchUrl(Uri.parse('mailto:${PortfolioData.email}')),
+          ),
           const SizedBox(height: 10),
-          ContactChannel(icon: '💼', label: PortfolioData.linkedin),
+          ContactChannel(
+            icon: '💼', 
+            label: PortfolioData.linkedin,
+            onTap: () => launchUrl(Uri.parse('https://${PortfolioData.linkedin}')),
+          ),
           const SizedBox(height: 10),
-          ContactChannel(icon: '🐙', label: PortfolioData.github),
+          ContactChannel(
+            icon: '🐙', 
+            label: PortfolioData.github,
+            onTap: () => launchUrl(Uri.parse('https://${PortfolioData.github}')),
+          ),
           // const SizedBox(height: 10),
           // ContactChannel(icon: '𝕏', label: PortfolioData.twitter),
         ],
@@ -680,6 +763,32 @@ class _ContactInfo extends StatelessWidget {
 class _ContactForm extends StatelessWidget {
   final TextEditingController nameCtrl, emailCtrl, subjectCtrl, msgCtrl;
   const _ContactForm({required this.nameCtrl, required this.emailCtrl, required this.subjectCtrl, required this.msgCtrl});
+
+  String? _encodeQueryParameters(Map<String, String> params) {
+    return params.entries
+        .map((MapEntry<String, String> e) =>
+            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .join('&');
+  }
+
+  void _sendMessage() {
+    final String name = nameCtrl.text.trim();
+    final String email = emailCtrl.text.trim();
+    final String subject = subjectCtrl.text.trim();
+    final String msg = msgCtrl.text.trim();
+
+    final String body = 'Name: $name\nEmail: $email\n\n$msg';
+
+    final Uri emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: PortfolioData.email,
+      query: _encodeQueryParameters(<String, String>{
+        'subject': subject.isNotEmpty ? subject : 'Project inquiry',
+        'body': body,
+      }),
+    );
+    launchUrl(emailLaunchUri);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -700,7 +809,7 @@ class _ContactForm extends StatelessWidget {
           const SizedBox(height: 16),
           _Field(label: 'Message', ctrl: msgCtrl, hint: 'Tell me about your project, timeline, and budget...', maxLines: 5),
           const SizedBox(height: 20),
-          GlowButton(label: 'Send Message →', onTap: () {}),
+          GlowButton(label: 'Send Message →', onTap: _sendMessage),
         ],
       ),
     );
@@ -786,7 +895,7 @@ class FooterSection extends StatelessWidget {
                   style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800, fontSize: 14, color: Colors.white)),
             ),
             if (w > 600)
-              Text('© 2024 Alex Morgan · Built with Flutter 💙',
+              Text('© 2026 Sagar Zadafiya · Built with Flutter 💙',
                   style: GoogleFonts.plusJakartaSans(fontSize: 12, color: AppColors.textDim)),
             TextButton(
               onPressed: () {},
@@ -827,9 +936,11 @@ class _ResponsiveGrid extends StatelessWidget {
     for (int i = 0; i < children.length; i += cols) {
       final rowChildren = children.sublist(i, (i + cols).clamp(0, children.length));
       rows.add(
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: rowChildren.expand((w) => [Expanded(child: w), if (w != rowChildren.last) const SizedBox(width: 20)]).toList(),
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: rowChildren.expand((w) => [Expanded(child: w), if (w != rowChildren.last) const SizedBox(width: 20)]).toList(),
+          ),
         ),
       );
       if (i + cols < children.length) rows.add(const SizedBox(height: 20));
